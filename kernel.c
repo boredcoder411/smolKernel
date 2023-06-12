@@ -2,11 +2,10 @@
 
 void k_clear_screen();
 unsigned int k_printf(char *message, unsigned int line);
-void k_disable_vga_cursor();
+extern void disable_cursor();
 
 void k_main() {
 	k_clear_screen();
-	k_disable_vga_cursor();
 	k_printf("Hello, world! Welcome to my kernel.", 0);
 };
 
@@ -43,9 +42,4 @@ unsigned int k_printf(char *message, unsigned int line) {
 	};
 
 	return(1);
-}
-
-void k_disable_vga_cursor() {
-	outb(0x3D4, 0x0A);
-	outb(0x3D5, 0x20);
 }
