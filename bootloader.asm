@@ -30,6 +30,5 @@ disable_cursor:
 start:
 	cli
 	call k_main
+	call disable_cursor
 	hlt
-times 510-($-$$) db 0
-dw 0xaa55
