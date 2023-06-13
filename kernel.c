@@ -3,7 +3,7 @@
 
 void k_clear_screen();
 unsigned int k_printf(char *message, unsigned int line);
-extern void disable_cursor();
+void disable_cursor();
 void k_keyboard();
 
 void k_main()
@@ -72,4 +72,10 @@ void k_keyboard()
 		}
 
 	} while (c != 1); // 1= ESCAPE
+}
+
+void disable_cursor()
+{
+	outb(0x3D4, 0x0A);
+	outb(0x3D5, 0x20);
 }
