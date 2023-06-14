@@ -8,6 +8,7 @@ void k_keyboard();
 
 void k_main()
 {
+	disable_cursor();
 	k_clear_screen();
 	k_printf("Hello, world! Welcome to my kernel.", 0);
 	k_keyboard();
