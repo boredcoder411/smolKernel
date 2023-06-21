@@ -1,5 +1,6 @@
-#include <sys/io.h>
-#include <string.h>
+#include "./io.h"
+#include "./string.h"
+
 #define WHITE_TXT 0x07
 
 void k_clear_screen();
@@ -7,6 +8,7 @@ unsigned int k_printf(char *message, unsigned int line);
 void disable_cursor();
 void k_keyboard();
 int k_keyboard_handler(int scancode);
+void process_command(char *command);
 
 void k_main()
 {
@@ -58,11 +60,60 @@ unsigned int k_printf(char *message, unsigned int line)
 
 void k_keyboard()
 {
-	do
-	{
-		k_keyboard_handler(inb(0x60));
-	} while (inb(0x60) != 1);
+    char command[80];
+    int index = 0;
+    int previous_scancode = -1;
+    int entered_command = 0;
+
+    while (1)
+    {
+        int scancode = inb(0x60);
+
+        if (scancode != previous_scancode)
+        {
+            previous_scancode = scancode;
+
+            if (scancode != -1)
+            {
+                if (scancode == 0x1C)
+                {
+                    if (entered_command)
+                    {
+                        command[index] = '\0';
+                        k_printf("\n", 2);
+                        process_command(command);
+                        index = 0;
+                        entered_command = 0;
+						strcpy(command, "");
+                    }
+                }
+                else if (scancode == 0x0E)
+                {
+                    if (index > 0)
+                    {
+                        index--;
+                        command[index] = ' ';
+                        k_printf(command, 2);
+                    }
+                }
+                else
+                {
+                    char character = k_keyboard_handler(scancode);
+
+                    if (character != '\0')
+                    {
+                        command[index] = character;
+                        index++;
+                        entered_command = 1;
+						k_printf(command, 2);
+                    }
+                }
+            }
+        }
+    }
 }
+
+
 
 void disable_cursor()
 {
@@ -75,160 +126,118 @@ int k_keyboard_handler(int scancode)
 	switch (scancode)
 	{
 	case 0x00:
-		k_printf("ERROR", 2);
-		break;
+		return ' ';
 	case 0x01:
-		k_printf("ESC", 2);
-		break;
+		return '\0';
 	case 0x02:
-		k_printf("1", 2);
-		break;
+		return '1';
 	case 0x03:
-		k_printf("2", 2);
-		break;
+		return '2';
 	case 0x04:
-		k_printf("3", 2);
-		break;
+		return '3';
 	case 0x05:
-		k_printf("4", 2);
-		break;
+		return '4';
 	case 0x06:
-		k_printf("5", 2);
-		break;
+		return '5';
 	case 0x07:
-		k_printf("6", 2);
-		break;
+		return '6';
 	case 0x08:
-		k_printf("7", 2);
-		break;
+		return '7';
 	case 0x09:
-		k_printf("8", 2);
-		break;
+		return '8';
 	case 0x0A:
-		k_printf("9", 2);
-		break;
+		return '9';
 	case 0x0B:
-		k_printf("0", 2);
-		break;
+		return '0';
 	case 0x10:
-		k_printf("q", 2);
-		break;
+		return 'q';
 	case 0x11:
-		k_printf("w", 2);
-		break;
+		return 'w';
 	case 0x12:
-		k_printf("e", 2);
-		break;
+		return 'e';
 	case 0x13:
-		k_printf("r", 2);
-		break;
+		return 'r';
 	case 0x14:
-		k_printf("t", 2);
-		break;
+		return 't';
 	case 0x15:
-		k_printf("y", 2);
-		break;
+		return 'y';
 	case 0x16:
-		k_printf("u", 2);
-		break;
+		return 'u';
 	case 0x17:
-		k_printf("i", 2);
-		break;
+		return 'i';
 	case 0x18:
-		k_printf("o", 2);
-		break;
+		return 'o';
 	case 0x19:
-		k_printf("p", 2);
-		break;
+		return 'p';
 	case 0x1A:
-		k_printf("¨", 2);
-		break;
+		return '¨';
 	case 0x1B:
-		k_printf("'", 2);
-		break;
-	case 0x1C:
-		k_printf("ENTER", 2);
-		break;
+		return '\'';
 	case 0x1E:
-		k_printf("a", 2);
-		break;
+		return 'a';
 	case 0x1F:
-		k_printf("s", 2);
-		break;
+		return 's';
 	case 0x20:
-		k_printf("d", 2);
-		break;
+		return 'd';
 	case 0x21:
-		k_printf("f", 2);
-		break;
+		return 'f';
 	case 0x22:
-		k_printf("g", 2);
-		break;
+		return 'g';
 	case 0x23:
-		k_printf("h", 2);
-		break;
+		return 'h';
 	case 0x24:
-		k_printf("j", 2);
-		break;
+		return 'j';
 	case 0x25:
-		k_printf("k", 2);
-		break;
+		return 'k';
 	case 0x26:
-		k_printf("l", 2);
-		break;
+		return 'l';
 	case 0x27:
-		k_printf("ç", 2);
-		break;
+		return 'ç';
 	case 0x28:
-		k_printf("`", 2);
-		break;
+		return '`';
 	case 0x2C:
-		k_printf("z", 2);
-		break;
+		return 'z';
 	case 0x2D:
-		k_printf("x", 2);
-		break;
+		return 'x';
 	case 0x2E:
-		k_printf("c", 2);
-		break;
+		return 'c';
 	case 0x2F:
-		k_printf("v", 2);
-		break;
+		return 'v';
 	case 0x30:
-		k_printf("b", 2);
-		break;
+		return 'b';
 	case 0x31:
-		k_printf("n", 2);
-		break;
+		return 'n';
 	case 0x32:
-		k_printf("m", 2);
-		break;
+		return 'm';
 	case 0x33:
-		k_printf(",", 2);
-		break;
+		return ',';
 	case 0x34:
-		k_printf(".", 2);
-		break;
+		return '.';
 	case 0x35:
-		k_printf("-", 2);
-		break;
-	case 0x1D:
-		k_printf("CTRL", 2);
-		break;
-	case 0x2A:
-		k_printf("SHIFT", 2);
-		break;
+		return '-';
 	case 0x39:
-		k_printf(" ", 2);
-		break;
+		return ' ';
 	default:
-		if (scancode <= 0x39 + 0x80)
-		{
-		}
-		else
-		{
-			k_printf("Unknown key up", 3);
-		}
-		break;
+		return '\0';
+	}
+}
+
+void process_command(char *command)
+{
+	if (strcmp(command, "clear") == 0)
+	{
+		k_clear_screen();
+	}
+	else if (strcmp(command, "hello") == 0)
+	{
+		k_printf("Hello! How are you?", 2);
+	}
+	else if (strcmp(command, "help") == 0)
+	{
+		k_printf("Available commands: clear, hello, help", 2);
+	}
+	else
+	{
+		k_printf("Unknown command. Type 'help' for a list of commands.", 2);
 	}
 }
