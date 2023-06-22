@@ -60,60 +60,58 @@ unsigned int k_printf(char *message, unsigned int line)
 
 void k_keyboard()
 {
-    char command[80];
-    int index = 0;
-    int previous_scancode = -1;
-    int entered_command = 0;
+	char command[80];
+	int index = 0;
+	int previous_scancode = -1;
+	int entered_command = 0;
 
-    while (1)
-    {
-        int scancode = inb(0x60);
+	while (1)
+	{
+		int scancode = inb(0x60);
 
-        if (scancode != previous_scancode)
-        {
-            previous_scancode = scancode;
+		if (scancode != previous_scancode)
+		{
+			previous_scancode = scancode;
 
-            if (scancode != -1)
-            {
-                if (scancode == 0x1C)
-                {
-                    if (entered_command)
-                    {
-                        command[index] = '\0';
-                        k_printf("\n", 2);
-                        process_command(command);
-                        index = 0;
-                        entered_command = 0;
+			if (scancode != -1)
+			{
+				if (scancode == 0x1C)
+				{
+					if (entered_command)
+					{
+						command[index] = '\0';
+						k_printf("\n", 2);
+						process_command(command);
+						index = 0;
+						entered_command = 0;
 						strcpy(command, "");
-                    }
-                }
-                else if (scancode == 0x0E)
-                {
-                    if (index > 0)
-                    {
-                        index--;
-                        command[index] = ' ';
-                        k_printf(command, 2);
-                    }
-                }
-                else
-                {
-                    char character = k_keyboard_handler(scancode);
-
-                    if (character != '\0')
-                    {
-                        command[index] = character;
-                        index++;
-                        entered_command = 1;
+					}
+				}
+				else if (scancode == 0x0E)
+				{
+					if (index > 0)
+					{
+						index--;
+						command[index] = ' ';
 						k_printf(command, 2);
-                    }
-                }
-            }
-        }
-    }
+					}
+				}
+				else
+				{
+					char character = k_keyboard_handler(scancode);
+
+					if (character != '\0')
+					{
+						command[index] = character;
+						index++;
+						entered_command = 1;
+						k_printf(command, 2);
+					}
+				}
+			}
+		}
+	}
 }
-
-
 
 void disable_cursor()
 {
