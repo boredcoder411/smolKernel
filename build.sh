@@ -5,7 +5,7 @@ grub-file --is-x86-multiboot myos.bin
 echo $?
 cp myos.bin isodir/boot/myos.bin
 grub-mkrescue -o myos.iso isodir
-qemu-system-i386 -cdrom myos.iso
+qemu-system-i386 -cdrom myos.iso -m 1G
 rm *.o
 rm *.bin
 rm isodir/boot/myos.bin

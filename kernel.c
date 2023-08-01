@@ -1,7 +1,8 @@
 #include "./io.h"
 #include "./string.h"
+#include "./bool.h"
 
-#define WHITE_TXT 0x07
+#define WHITE_TXT 0x0F
 
 void k_clear_screen();
 unsigned int k_printf(char *message, unsigned int line);
@@ -9,11 +10,17 @@ void disable_cursor();
 void k_keyboard();
 int k_keyboard_handler(int scancode);
 void process_command(char *command);
+char* itoa(int value, char * str, int base);
 
 void k_main()
 {
 	k_clear_screen();
-	k_printf("Hello, world! Welcome to my kernel.", 0);
+	k_printf("Hello world!", 0);
+	register int memap asm("ebx");
+	int *memap_ptr = memap;
+	char buffer [sizeof(int) * 8 + 1];
+	itoa(memap, buffer, 10);
+	k_printf(buffer, 3);
 	k_keyboard();
 };
 
@@ -238,4 +245,42 @@ void process_command(char *command)
 	{
 		k_printf("Unknown command. Type 'help' for a list of commands.", 2);
 	}
+}
+
+char* itoa( int value, char * str, int base )
+{
+    char * rc;
+    char * ptr;
+    char * low;
+    // Check for supported base.
+    if ( base < 2 || base > 36 )
+    {
+        *str = '\0';
+        return str;
+    }
+    rc = ptr = str;
+    // Set '-' for negative decimals.
+    if ( value < 0 && base == 10 )
+    {
+        *ptr++ = '-';
+    }
+    // Remember where the numbers start.
+    low = ptr;
+    // The actual conversion.
+    do
+    {
+        // Modulo is negative for negative value. This trick makes abs() unnecessary.
+        *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + value % base];
+        value /= base;
+    } while ( value );
+    // Terminating the string.
+    *ptr-- = '\0';
+    // Invert the numbers.
+    while ( low < ptr )
+    {
+        char tmp = *low;
+        *low++ = *ptr;
+        *ptr-- = tmp;
+    }
+    return rc;
 }
