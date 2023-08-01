@@ -16,11 +16,11 @@ void k_main()
 {
 	k_clear_screen();
 	k_printf("Hello world!", 0);
+	k_printf("Value retrieved from ebx register:", 2);
 	register int memap asm("ebx");
 	int *memap_ptr = memap;
 	char buffer [sizeof(int) * 8 + 1];
 	itoa(memap, buffer, 10);
-	k_printf("Value retrieved from ebx register:      ", 3);
 	k_printf(buffer, 3);
 	k_keyboard();
 };
