@@ -20,6 +20,7 @@ void k_main()
 	int *memap_ptr = memap;
 	char buffer [sizeof(int) * 8 + 1];
 	itoa(memap, buffer, 10);
+	k_printf("Value retrieved from ebx register:      ", 3);
 	k_printf(buffer, 3);
 	k_keyboard();
 };
